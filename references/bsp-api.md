@@ -35,6 +35,10 @@ void app_main(void)
   I/O expander errors.
 - `bsp_display_lock(timeout_ms)` returns `false` on timeout; 0 means wait
   forever. Every LVGL call outside LVGL's own callbacks must be inside a lock.
+  **For a UI update that must land, lock with 0.** A short timeout silently
+  drops the update when a heavy frame (e.g. a large scaled GIF) holds the lock
+  longer than the timeout — the screen then sticks on the old content while the
+  rest of your handler (state vars, sounds) runs on as if it succeeded.
 - `bsp_display_get_input_dev()` returns the touch `lv_indev_t`.
 - `bsp_display_rotate(disp, LV_DISPLAY_ROTATION_90)` rotates the display.
   That's the LVGL v9 constant; v8 uses `LV_DISP_ROT_90`. The BSP accepts
