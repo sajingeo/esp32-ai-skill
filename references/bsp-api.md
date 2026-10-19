@@ -39,6 +39,13 @@ void app_main(void)
 - `bsp_display_rotate(disp, LV_DISPLAY_ROTATION_90)` rotates the display.
   That's the LVGL v9 constant; v8 uses `LV_DISP_ROT_90`. The BSP accepts
   either LVGL major version, and the component manager picks v9 by default.
+- **You get LVGL v9** (9.6.0 with ESP-IDF v6.0.2). Beyond the v8/v9 names
+  above, guard these with `#if LVGL_VERSION_MAJOR >= 9`:
+  `lv_anim_set_duration` / `lv_anim_set_playback_duration` / `lv_anim_delete`
+  (v8: `lv_anim_set_time` / `..._playback_time` / `lv_anim_del`), and
+  `lv_obj_remove_flag` (v8: `lv_obj_clear_flag`). In v9
+  `lv_obj_add_flag`/`lv_obj_remove_flag` still compile but warn as deprecated
+  (it points you at `lv_obj_set_hidden()` etc.) — harmless.
 - Resolution: `BSP_LCD_H_RES` × `BSP_LCD_V_RES` = 368 × 448, RGB565.
 - For custom buffer settings, use `bsp_display_start_with_config()`.
 - Tearing and refresh mode are set in menuconfig under
@@ -48,6 +55,32 @@ void app_main(void)
 **Without LVGL:** `bsp_display_new()` returns the raw `esp_lcd_panel_handle_t`
 for `esp_lcd_panel_draw_bitmap()`, and `bsp_touch_new()` returns an
 `esp_lcd_touch_handle_t`. The bare-panel example is `13_display_colorbar`.
+
+## Reading host input over USB-Serial-JTAG
+
+The Type-C port is the ESP32-S3's native USB. To read bytes the host sends to
+the board (e.g. a desktop script pushing status to display), install the driver
+and read. It coexists with console logging (`CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y`)
+because RX and TX are independent directions — logs still go out while you read.
+
+```c
+#include "driver/usb_serial_jtag.h"   // add esp_driver_usb_serial_jtag to REQUIRES
+
+usb_serial_jtag_driver_config_t cfg = USB_SERIAL_JTAG_DRIVER_CONFIG_DEFAULT();
+esp_err_t err = usb_serial_jtag_driver_install(&cfg);
+// ESP_ERR_INVALID_STATE means the console already installed it — treat as OK
+uint8_t buf[64];
+int n = usb_serial_jtag_read_bytes(buf, sizeof(buf), pdMS_TO_TICKS(200));
+// assemble lines yourself; read returns whatever arrived within the timeout
+```
+
+- From a **Mac host, write to `/dev/cu.usbmodem*`, not `/dev/tty.*`**: the
+  call-up (`cu`) device doesn't assert DTR on open, so writing won't reset the
+  board. `printf 'line\n' > /dev/cu.usbmodem*` is enough; no baud/stty needed
+  (USB CDC ignores baud).
+- One owner per direction. `idf.py monitor` (reading TX) and a host writer (to
+  RX) can run at the same time, but a host reader and the monitor cannot both
+  own the port — quit the monitor before running a host script that reads.
 
 ## I2C bus (shared)
 

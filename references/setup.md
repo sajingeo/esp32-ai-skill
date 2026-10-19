@@ -114,8 +114,15 @@ but put anything that should persist into `sdkconfig.defaults`.
 Useful extras:
 - `idf.py size`: flash and RAM use
 - `idf.py -p PORT monitor`: attach to a running board without reflashing
+- `timeout 8 idf.py -p PORT monitor`: grab the boot log non-interactively (no
+  TTY needed) — useful for agent-driven boot checks. In non-interactive mode
+  the monitor reads commands from stdin: `reset`, `send <text>`, `sleep <s>`,
+  `expect [--timeout <s>] <regex>`, `exit`.
 - `idf.py -p PORT erase-flash`: wipe everything, including NVS and Wi-Fi
   credentials. Say so before running it.
+
+ESP-IDF **v6.0.2 is confirmed** building this skill's template (resolves LVGL
+9.6.0, BSP 2.0.3). v6.1 is outside the template's `idf` range and untested.
 
 ## 4. Start from Waveshare's examples
 
