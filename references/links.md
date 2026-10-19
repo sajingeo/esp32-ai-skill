@@ -17,8 +17,11 @@
 
 ## Espressif
 
+- ESP-IDF on the Espressif Developer Portal (install guides, docs, articles): https://developer.espressif.com/tags/esp-idf/
+- EIM, the ESP-IDF Installation Manager: https://docs.espressif.com/projects/idf-im-ui/en/latest/
+  - CLI commands (`eim install`, `list`, `select`, `shell`, `run`): https://docs.espressif.com/projects/idf-im-ui/en/latest/cli_commands.html
+  - Introductory blog post: https://developer.espressif.com/blog/2026/03/esp-idf-installation-manager/
 - ESP-IDF get started (ESP32-S3): https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/get-started/index.html
-- ESP-IDF Windows installer: https://dl.espressif.com/dl/esp-idf/
 - ESP32-S3 datasheet: https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_en.pdf
 - ESP32-S3 USB-Serial-JTAG console: https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-guides/usb-serial-jtag-console.html
 - esp_codec_dev: https://components.espressif.com/components/espressif/esp_codec_dev

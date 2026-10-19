@@ -31,9 +31,10 @@ Then just ask, for example:
 ## Get started by hand
 
 ```sh
-# 1. ESP-IDF v5.5.x (details: references/setup.md)
-git clone -b v5.5.5 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf
-~/esp/esp-idf/install.sh esp32s3 && . ~/esp/esp-idf/export.sh
+# 1. ESP-IDF via EIM, the ESP-IDF Installation Manager (details: references/setup.md)
+brew tap espressif/eim && brew install eim
+eim install                      # pin a version with: eim install -i v5.5.5
+eim shell                        # opens a shell with ESP-IDF active
 
 # 2. New project from the template
 ./scripts/new-project.sh my_app ~/projects && cd ~/projects/my_app

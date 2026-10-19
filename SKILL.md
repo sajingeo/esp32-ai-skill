@@ -42,7 +42,11 @@ reference that matches the task:
 ## Default workflow
 
 1. **Confirm the toolchain:** `idf.py --version` should report ESP-IDF v5.5.x
-   or v6.0.x. If not, follow `references/setup.md`.
+   or v6.0.x. If `idf.py` isn't found, ESP-IDF is probably installed with EIM
+   but not activated. Run builds through `eim run "idf.py build"`, or ask the
+   human to open `eim shell`. If ESP-IDF isn't installed, the setup is
+   `brew tap espressif/eim && brew install eim && eim install` (see
+   `references/setup.md`).
 2. **Start from the template:**
    `scripts/new-project.sh <name> [dest-dir]` copies `templates/hello_amoled`,
    which already has the BSP dependency, PSRAM, 16 MB flash and a partition

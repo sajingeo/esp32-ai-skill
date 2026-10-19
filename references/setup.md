@@ -4,25 +4,63 @@ The board is programmed with **ESP-IDF v5.5.x or v6.0.x**. Waveshare's CI builds
 its examples with v5.5.5 and v6.0.2. Arduino also works (see the end), but this
 skill defaults to ESP-IDF because that's what the managed BSP targets.
 
-## 1. Install ESP-IDF (once per machine)
+## 1. Install ESP-IDF with EIM (once per machine)
 
-**macOS / Linux**
+Use EIM, Espressif's ESP-IDF Installation Manager. It installs ESP-IDF and its
+tools, and can keep several IDF versions side by side.
+
+**macOS (Homebrew), the recommended path**
 
 ```sh
-# prerequisites
-#   macOS:  brew install cmake ninja dfu-util python3
-#   Ubuntu: sudo apt install git wget flex bison gperf python3 python3-venv \
-#             cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
-mkdir -p ~/esp && cd ~/esp
-git clone -b v5.5.5 --recursive https://github.com/espressif/esp-idf.git
-cd esp-idf && ./install.sh esp32s3
-. ./export.sh          # run in every new shell, or add an alias:
-# echo "alias get_idf='. $HOME/esp/esp-idf/export.sh'" >> ~/.zshrc
-idf.py --version
+brew tap espressif/eim
+brew install eim                 # CLI. For the GUI instead: brew install --cask eim-gui
+eim install                      # installs ESP-IDF (non-interactive by default)
 ```
 
-**Windows:** use Espressif's ESP-IDF Tools Installer (link in `links.md`), pick
-v5.5.x, then work from the "ESP-IDF PowerShell" shortcut.
+`eim install` takes options:
+- `-i v5.5.5` pins a version. Use v5.5.x or v6.0.x for this board.
+- `-t esp32s3` installs only the ESP32-S3 toolchain.
+- `-p <dir>` sets the install location.
+
+`eim wizard` walks through the same choices interactively.
+
+**Activate ESP-IDF in a shell** before running `idf.py`, using any of these:
+
+```sh
+eim shell                        # new shell with the selected IDF active (exit to leave)
+eim run "idf.py build"           # run a single command with IDF active
+source ~/.espressif/tools/activate_idf_v5.5.5.sh   # or source the activation script
+```
+
+The script name depends on the version you installed, and `eim select` lists
+installed versions with their script paths. A handy alias:
+`alias get_idf='source ~/.espressif/tools/activate_idf_v5.5.5.sh'`.
+
+Other EIM commands:
+- `eim list` shows installed versions.
+- `eim select` sets the active one.
+- `eim fix` repairs a broken install.
+
+**Linux:** EIM installs the same way through Homebrew, or through Espressif's
+APT/DNF/pacman repositories (`eim-cli` package). See the EIM docs in `links.md`.
+Then run `eim install` as above.
+
+**Windows:** `winget install Espressif.EIM-CLI` (or `Espressif.EIM` for the
+GUI), then `eim install`.
+
+**Check the install:** `idf.py --version` in an activated shell should report
+the version you installed.
+
+<details>
+<summary>Manual install without EIM</summary>
+
+```sh
+mkdir -p ~/esp && cd ~/esp
+git clone -b v5.5.5 --recursive https://github.com/espressif/esp-idf.git
+cd esp-idf && ./install.sh esp32s3 && . ./export.sh
+```
+
+</details>
 
 **Linux only:** add yourself to the `dialout` group so you can open the port:
 `sudo usermod -aG dialout $USER`, then log out and back in.
