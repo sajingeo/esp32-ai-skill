@@ -55,6 +55,14 @@ only when the app has broken USB.
 5. V1 versus V2: an old BSP (`^1`) on a V2 board, or hand-written SH8601
    init code on a CO5300 panel, gives a black or garbled screen. Use BSP
    `^2.0.3`.
+6. **Black after a reflash/reset, but the boot log is clean** (panel
+   `create success`, `LVGL: Starting LVGL task`, your app reaches its ready
+   log): the CO5300 AMOLED can come up dark after a *warm* reset —
+   `rst:0x15 (USB_UART_CHIP_RESET)` from `idf.py flash`/`monitor` or an esptool
+   RTS hard-reset. The BSP's `esp_lcd_panel_disp_on_off(..., true)` doesn't
+   recover it. Fix: **fully power-cycle** — unplug USB-C (hold PWR 6 s if a
+   battery is attached), wait a few seconds, replug. A hard-reset over the wire
+   is not enough; only a real power cycle clears it.
 
 ## The image is shifted, or touch doesn't line up
 
