@@ -56,6 +56,38 @@ void app_main(void)
 for `esp_lcd_panel_draw_bitmap()`, and `bsp_touch_new()` returns an
 `esp_lcd_touch_handle_t`. The bare-panel example is `13_display_colorbar`.
 
+## Animated GIFs and large images
+
+Enable the decoder (`CONFIG_LV_USE_GIF=y`) and embed each GIF as an
+`lv_image_dsc_t` whose data is the raw file bytes — LVGL reads the real size
+from the data, so leave `w`/`h` at 0:
+
+```c
+const lv_image_dsc_t my_gif = {
+    .header = { .cf = LV_COLOR_FORMAT_RAW, .w = 0, .h = 0 },
+    .data_size = sizeof(my_gif_map),   // raw .gif bytes in a uint8_t[]
+    .data = my_gif_map,
+};
+
+lv_obj_t *g = lv_gif_create(lv_screen_active());
+lv_gif_set_src(g, &my_gif);            // plays and loops automatically
+lv_image_set_scale(g, 640);            // lv_gif is an lv_image: 256 = 100%
+lv_image_set_pivot(g, w/2, h/2);       // so scaling stays centered under lv_obj_align
+```
+
+- **Critical gotcha — LVGL's default memory pool is too small for images.**
+  On this BSP the component manager defaults LVGL to its builtin allocator
+  (`CONFIG_LV_USE_BUILTIN_MALLOC=y`, `LV_MEM_SIZE` 64 KB). A 128×128 ARGB8888
+  GIF frame alone needs ~65 KB, so the decode fails and the widget shows
+  **nothing** — and since `CONFIG_LV_USE_LOG` is off by default, there is no
+  error. Fix: `CONFIG_LV_USE_CLIB_MALLOC=y`, which routes `lv_malloc` to the
+  C-library heap (PSRAM-backed, since `CONFIG_SPIRAM_USE_MALLOC=y`). Turn on
+  `CONFIG_LV_USE_LOG=y` while debugging a blank image.
+- GIF config changes live in `sdkconfig.defaults`; delete `sdkconfig` and
+  rebuild so they actually apply (an existing `sdkconfig` is not re-derived).
+- The LVGL example is `examples/libs/gif`; the ESP image-converter emits the
+  same descriptor shape.
+
 ## Reading host input over USB-Serial-JTAG
 
 The Type-C port is the ESP32-S3's native USB. To read bytes the host sends to

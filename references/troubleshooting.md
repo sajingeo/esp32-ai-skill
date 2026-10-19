@@ -71,6 +71,14 @@ detects the V2 touch controller. If you drive the panel yourself, add the
 offset. If touch is mirrored, check the rotation passed to
 `bsp_display_rotate()`.
 
+## An image or GIF shows nothing (rest of the UI is fine)
+
+The decoder couldn't allocate its buffer. LVGL defaults to its builtin memory
+pool (`CONFIG_LV_USE_BUILTIN_MALLOC=y`, `LV_MEM_SIZE` 64 KB) — too small for a
+128×128 ARGB8888 frame (~65 KB), and with `CONFIG_LV_USE_LOG` off the failure
+is silent. Set `CONFIG_LV_USE_CLIB_MALLOC=y` (PSRAM-backed heap), delete
+`sdkconfig`, rebuild. Enable `CONFIG_LV_USE_LOG=y` to see the decode error.
+
 ## I2C devices are missing
 
 - All onboard devices share GPIO15/14. A second `i2c_new_master_bus()` on the
